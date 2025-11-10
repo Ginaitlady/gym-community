@@ -64,6 +64,10 @@ gym-community/
 └── index.html          # HTML Template
 ```
 
+## Project Status
+This is an ongoing project currently under development.  
+The next phase will include backend integration for user authentication, workout tracking, and community interaction.
+
 ## Key Features
 
 - ✅ Responsive Design (Mobile, Tablet, Desktop)
