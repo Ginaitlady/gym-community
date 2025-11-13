@@ -1,15 +1,31 @@
 # FitHub - Performance-Driven Gym Community
 
-A React web application for Performance-Driven Gym Community.
+A modern React web app built to connect and empower the fitness community.
+
+## Overview
+
+FitHub is a performance-driven gym community platform designed to help users achieve their fitness goals through data tracking, social motivation, and professional trainer matching.
+The project began as a hands-on exploration of React 18 and modern front-end development workflows, combining Cursor AI and Figma MCP for intelligent UI generation and rapid iteration.
+
+This project demonstrates proficiency in React ecosystem architecture, component-driven design, and AI-assisted development — forming the foundation for future integration with a database-backed system for real-time data handling and user management.
 
 ## Tech Stack
 
+<<<<<<< HEAD
 - **React 18** - UI Library
 - **TypeScript** - Type Safety
 - **Vite** - Build Tool
 - **Tailwind CSS** - Styling
 - **Supabase** - Backend as a Service (Database & Authentication)
 
+=======
+- **React 18** - UI component architecture
+- **TypeScript** - Type safety and clean code structure
+- **Vite** - Lightning-fast build and development server
+- **Tailwind CSS** - Responsive and maintainable styling
+- **Database integration (MongoDB / Firebase) is planned for future updates to enable user profiles, community posts, and workout tracking.
+- 
+>>>>>>> fa2b2b44a6c193bc858409557a6efc4d867580c7
 ## Getting Started
 
 ### Prerequisites
@@ -85,6 +101,10 @@ gym-community/
 └── index.html          # HTML Template
 ```
 
+## Project Status
+This is an ongoing project currently under development.  
+The next phase will include backend integration for user authentication, workout tracking, and community interaction.
+
 ## Key Features
 
 - ✅ Responsive Design (Mobile, Tablet, Desktop)
@@ -103,6 +123,13 @@ gym-community/
 
 Tailwind CSS configuration can be modified in `tailwind.config.js`.
 Color themes are managed in custom classes in `src/index.css`.
+
+## Development Process
+
+Designed UI in Figma → Imported and refined via Figma MCP.
+Implemented structure using Cursor AI, which auto-suggested and generated React component scaffolds.
+Manually refined component logic, responsive layouts, and TypeScript types for production-grade maintainability.
+This workflow highlights AI-augmented front-end development — using design intelligence while maintaining developer control.
 
 ## License
 
