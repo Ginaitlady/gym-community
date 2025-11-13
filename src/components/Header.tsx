@@ -1,7 +1,11 @@
 import { useState } from 'react'
+import SignUpModal from './SignUpModal'
+import SignInModal from './SignInModal'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isSignUpOpen, setIsSignUpOpen] = useState(false)
+  const [isSignInOpen, setIsSignInOpen] = useState(false)
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -30,8 +34,8 @@ const Header = () => {
           </div>
           <div className="hidden md:block">
             <div className="flex items-center space-x-4">
-              <button className="text-gray-700 hover:text-primary-600 font-medium">Sign In</button>
-              <button className="btn-primary">Sign Up</button>
+              <button onClick={() => setIsSignInOpen(true)} className="text-gray-700 hover:text-primary-600 font-medium">Sign In</button>
+              <button onClick={() => setIsSignUpOpen(true)} className="btn-primary">Sign Up</button>
             </div>
           </div>
           <div className="md:hidden">
@@ -65,15 +69,29 @@ const Header = () => {
                 About
               </a>
               <div className="pt-4 pb-2 space-y-1">
-                <button className="text-gray-700 hover:text-primary-600 block w-full text-left px-3 py-2 rounded-md text-base font-medium">
+                <button onClick={() => setIsSignInOpen(true)} className="text-gray-700 hover:text-primary-600 block w-full text-left px-3 py-2 rounded-md text-base font-medium">
                   Sign In
                 </button>
-                <button className="btn-primary w-full">Sign Up</button>
+                <button onClick={() => setIsSignUpOpen(true)} className="btn-primary w-full">Sign Up</button>
               </div>
             </div>
           </div>
         )}
       </nav>
+      <SignUpModal 
+        isOpen={isSignUpOpen} 
+        onClose={() => setIsSignUpOpen(false)}
+        onSuccess={() => {
+          console.log('User signed up successfully!')
+        }}
+      />
+      <SignInModal 
+        isOpen={isSignInOpen} 
+        onClose={() => setIsSignInOpen(false)}
+        onSuccess={() => {
+          console.log('User signed in successfully!')
+        }}
+      />
     </header>
   )
 }
