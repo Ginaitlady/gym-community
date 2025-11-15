@@ -80,44 +80,94 @@ npm run preview
 ## Project Structure
 
 ```
-gym-community/
-├── src/
-│   ├── components/      # React Components
-│   │   ├── Header.tsx
-│   │   ├── Hero.tsx
-│   │   ├── Features.tsx
-│   │   ├── Stats.tsx
-│   │   ├── Community.tsx
-│   │   ├── Footer.tsx
-│   │   └── SignUpModal.tsx
-│   ├── lib/             # Supabase Client
-│   │   └── supabase.ts
-│   ├── utils/           # Utility Functions
-│   │   └── api.ts       # API Client
-│   ├── App.tsx         # Main App Component
-│   ├── main.tsx        # Entry Point
-│   └── index.css       # Global Styles
-├── public/             # Static Files
-└── index.html          # HTML Template
+src/
+ ├─ pages/
+ │   ├─ Home.tsx
+ │   ├─ Community.tsx
+ │   ├─ PostDetail.tsx
+ │   ├─ Profile.tsx
+ │   ├─ WorkoutDashboard.tsx
+ │   ├─ RoutineBuilder.tsx
+ │   ├─ TrainerApplication.tsx
+ │   ├─ AdminTrainerReview.tsx
+ │   └─ SignIn.tsx / SignUp.tsx
+ │
+ ├─ components/
+ │   ├─ layout/
+ │   │    ├─ Header.tsx
+ │   │    ├─ Footer.tsx
+ │   │    └─ Sidebar.tsx (Dashboard용)
+ │   │
+ │   ├─ community/
+ │   │    ├─ PostCard.tsx
+ │   │    ├─ PostList.tsx
+ │   │    ├─ Comment.tsx
+ │   │    ├─ LikeButton.tsx
+ │   │    ├─ NewPostForm.tsx
+ │   │    └─ CommentList.tsx
+ │   │
+ │   ├─ profile/
+ │   │    ├─ ProfileHeader.tsx
+ │   │    ├─ ProfileImageUploader.tsx
+ │   │    └─ ProfileStats.tsx
+ │   │
+ │   ├─ workout/
+ │   │    ├─ RoutineCard.tsx
+ │   │    ├─ RoutineEditor.tsx
+ │   │    ├─ ExerciseInput.tsx
+ │   │    └─ ProgressChart.tsx
+ │   │
+ │   ├─ trainer/
+ │   │    ├─ TrainerBadge.tsx
+ │   │    └─ TrainerRequestStatus.tsx
+ │   │
+ │   ├─ ui/
+ │   │    ├─ Button.tsx
+ │   │    ├─ Card.tsx
+ │   │    ├─ Modal.tsx
+ │   │    ├─ Avatar.tsx
+ │   │    └─ Textarea.tsx
+ │
+ ├─ lib/
+ │   ├─ supabase.ts
+ │   ├─ auth.ts
+ │   ├─ helpers.ts
+ │   └─ validations.ts
+ │
+ ├─ hooks/
+ │   ├─ useAuth.ts
+ │   ├─ usePosts.ts
+ │   ├─ useComments.ts
+ │   └─ useRoutine.ts
+ │
+ └─ types/
+      ├─ Post.ts
+      ├─ User.ts
+      ├─ Comment.ts
+      └─ Routine.ts
+
 ```
+
+<img width="988" height="809" alt="image" src="https://github.com/user-attachments/assets/6b9e7727-b5a6-4958-9caf-aa0b0a644524" />
 
 ## Project Status
 This is an ongoing project currently under development.  
 The next phase will include backend integration for user authentication, workout tracking, and community interaction.
 
 ## Key Features
-
-- ✅ Responsive Design (Mobile, Tablet, Desktop)
-- ✅ Modern UI/UX
-- ✅ User Sign Up with Supabase Integration
-- ✅ Supabase PostgreSQL Database for User Storage
-- ✅ Built-in Authentication & Security
-- ✅ Row Level Security (RLS) Policies
-- ✅ Input Validation (Frontend)
-- ✅ Performance Tracking Section
-- ✅ Community Features
-- ✅ Statistics and Performance Display
-- ✅ User Testimonials
+- Fully responsive layout across all devices
+- Modern design system built from Figma MCP
+- User authentication with Supabase Auth
+- Secure PostgreSQL database with Row Level Security (RLS)
+- Complete user profile customization
+- Community system: posts, comments, likes, image uploads
+- Soft-delete system for safer data retention
+- Workout routine builder (JSONB structure)
+- Personal fitness dashboard with performance insights
+- Trainer application workflow with admin approval
+- Frontend input validation and clean error handling
+- Public/private content visibility options
+- User testimonials and social proof sections
 
 ## Customization
 
