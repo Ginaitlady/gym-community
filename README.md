@@ -11,7 +11,6 @@ This project demonstrates proficiency in React ecosystem architecture, component
 
 ## Tech Stack
 
-<<<<<<< HEAD
 - **React 18** - UI Library
 - **TypeScript** - Type Safety
 - **Vite** - Build Tool
@@ -28,17 +27,6 @@ This project demonstrates proficiency in React ecosystem architecture, component
 
 ## Open [http://localhost:5173] in your browser to view it.
 
-### Build
-
-```bash
-npm run build
-```
-
-### Preview
-
-```bash
-npm run preview
-```
 
 ## Project Structure
 
