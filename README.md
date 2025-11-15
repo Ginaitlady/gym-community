@@ -25,45 +25,8 @@ This project demonstrates proficiency in React ecosystem architecture, component
 - **Tailwind CSS** - Responsive and maintainable styling
 - **Database integration (MongoDB / Firebase) is planned for future updates to enable user profiles, community posts, and workout tracking.
 
-  
-## Getting Started
 
-### Prerequisites
-
-- Node.js (v18 or higher)
-- Supabase account (free tier available)
-
-### Frontend Installation
-
-```bash
-npm install
-```
-
-### Supabase Setup
-
-1. Create a Supabase account at [https://supabase.com](https://supabase.com)
-2. Create a new project
-3. Get your API keys from **Settings** → **API**
-4. Create the database table using the SQL in `SUPABASE_SETUP.md`
-5. Create a `.env` file in the root directory:
-```env
-VITE_SUPABASE_URL=your-project-url-here
-VITE_SUPABASE_ANON_KEY=your-anon-key-here
-```
-
-For detailed setup instructions, see `SUPABASE_SETUP.md` or `QUICK_START_SUPABASE.md`
-
-### Frontend Development Server
-
-In the root directory, start the frontend:
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:5173](http://localhost:5173) in your browser to view it.
-
-**Note**: Make sure you've set up Supabase and configured your `.env` file before using the sign-up feature.
+## Open [http://localhost:5173] in your browser to view it.
 
 ### Build
 
