@@ -24,8 +24,8 @@ This project demonstrates proficiency in React ecosystem architecture, component
 - **Vite** - Lightning-fast build and development server
 - **Tailwind CSS** - Responsive and maintainable styling
 - **Database integration (MongoDB / Firebase) is planned for future updates to enable user profiles, community posts, and workout tracking.
-- 
->>>>>>> fa2b2b44a6c193bc858409557a6efc4d867580c7
+
+  
 ## Getting Started
 
 ### Prerequisites
