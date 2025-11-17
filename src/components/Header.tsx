@@ -1,11 +1,64 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import SignUpModal from './SignUpModal'
 import SignInModal from './SignInModal'
+import { api } from '../utils/api'
+import { supabase } from '../lib/supabase'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSignUpOpen, setIsSignUpOpen] = useState(false)
   const [isSignInOpen, setIsSignInOpen] = useState(false)
+  const [currentUser, setCurrentUser] = useState<any>(null)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    loadUser()
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      loadUser()
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const loadUser = async () => {
+    const user = await api.getCurrentUser()
+    setCurrentUser(user)
+  }
+
+  const handleSignOut = async () => {
+    await api.signOut()
+    setCurrentUser(null)
+    navigate('/')
+    window.location.reload()
+  }
+
+  const handleRequestTrainer = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const { error } = await supabase
+        .from('trainer_approvals')
+        .insert({
+          user_id: user.id,
+          status: 'pending'
+        })
+
+      if (error) {
+        if (error.code === '23505') {
+          alert('You have already submitted a trainer approval request.')
+        } else {
+          throw error
+        }
+      } else {
+        alert('Trainer approval request submitted successfully!')
+      }
+    } catch (error: any) {
+      console.error('Error requesting trainer approval:', error)
+      alert(error.message || 'Failed to submit request')
+    }
+  }
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -13,29 +66,55 @@ const Header = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <h1 className="text-2xl font-bold text-primary-600">FitHub</h1>
+              <Link to="/" className="text-2xl font-bold text-primary-600">FitHub</Link>
             </div>
             <div className="hidden md:block ml-10">
               <div className="flex items-baseline space-x-4">
-                <a href="#home" className="text-gray-900 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                <Link to="/" className="text-gray-900 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                   Home
-                </a>
-                <a href="#features" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                  Features
-                </a>
-                <a href="#community" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                </Link>
+                <Link to="/community" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                   Community
-                </a>
-                <a href="#about" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                  About
-                </a>
+                </Link>
+                <Link to="/routines" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                  Routines
+                </Link>
+                {currentUser?.role === 'admin' && (
+                  <Link to="/admin" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                    Admin
+                  </Link>
+                )}
               </div>
             </div>
           </div>
           <div className="hidden md:block">
             <div className="flex items-center space-x-4">
-              <button onClick={() => setIsSignInOpen(true)} className="text-gray-700 hover:text-primary-600 font-medium">Sign In</button>
-              <button onClick={() => setIsSignUpOpen(true)} className="btn-primary">Sign Up</button>
+              {currentUser ? (
+                <>
+                  <Link
+                    to={`/profile/${currentUser.id}`}
+                    className="text-gray-700 hover:text-primary-600 font-medium"
+                  >
+                    {currentUser.first_name} {currentUser.last_name}
+                  </Link>
+                  {currentUser.role === 'member' && !currentUser.is_trainer_approved && (
+                    <button
+                      onClick={handleRequestTrainer}
+                      className="text-gray-700 hover:text-primary-600 font-medium text-sm"
+                    >
+                      Become Trainer
+                    </button>
+                  )}
+                  <button onClick={handleSignOut} className="text-gray-700 hover:text-primary-600 font-medium">
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button onClick={() => setIsSignInOpen(true)} className="text-gray-700 hover:text-primary-600 font-medium">Sign In</button>
+                  <button onClick={() => setIsSignUpOpen(true)} className="btn-primary">Sign Up</button>
+                </>
+              )}
             </div>
           </div>
           <div className="md:hidden">
@@ -56,23 +135,53 @@ const Header = () => {
         {isMenuOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t">
-              <a href="#home" className="text-gray-900 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium">
+              <Link to="/" className="text-gray-900 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
                 Home
-              </a>
-              <a href="#features" className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium">
-                Features
-              </a>
-              <a href="#community" className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium">
+              </Link>
+              <Link to="/community" className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
                 Community
-              </a>
-              <a href="#about" className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium">
-                About
-              </a>
+              </Link>
+              <Link to="/routines" className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                Routines
+              </Link>
+              {currentUser?.role === 'admin' && (
+                <Link to="/admin" className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                  Admin
+                </Link>
+              )}
               <div className="pt-4 pb-2 space-y-1">
-                <button onClick={() => setIsSignInOpen(true)} className="text-gray-700 hover:text-primary-600 block w-full text-left px-3 py-2 rounded-md text-base font-medium">
-                  Sign In
-                </button>
-                <button onClick={() => setIsSignUpOpen(true)} className="btn-primary w-full">Sign Up</button>
+                {currentUser ? (
+                  <>
+                    <Link
+                      to={`/profile/${currentUser.id}`}
+                      className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    {currentUser.role === 'member' && !currentUser.is_trainer_approved && (
+                      <button
+                        onClick={() => {
+                          handleRequestTrainer()
+                          setIsMenuOpen(false)
+                        }}
+                        className="text-gray-700 hover:text-primary-600 block w-full text-left px-3 py-2 rounded-md text-base font-medium"
+                      >
+                        Become Trainer
+                      </button>
+                    )}
+                    <button onClick={() => { handleSignOut(); setIsMenuOpen(false); }} className="text-gray-700 hover:text-primary-600 block w-full text-left px-3 py-2 rounded-md text-base font-medium">
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={() => setIsSignInOpen(true)} className="text-gray-700 hover:text-primary-600 block w-full text-left px-3 py-2 rounded-md text-base font-medium">
+                      Sign In
+                    </button>
+                    <button onClick={() => setIsSignUpOpen(true)} className="btn-primary w-full">Sign Up</button>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -82,14 +191,16 @@ const Header = () => {
         isOpen={isSignUpOpen} 
         onClose={() => setIsSignUpOpen(false)}
         onSuccess={() => {
-          console.log('User signed up successfully!')
+          loadUser()
+          setIsSignUpOpen(false)
         }}
       />
       <SignInModal 
         isOpen={isSignInOpen} 
         onClose={() => setIsSignInOpen(false)}
         onSuccess={() => {
-          console.log('User signed in successfully!')
+          loadUser()
+          setIsSignInOpen(false)
         }}
       />
     </header>
