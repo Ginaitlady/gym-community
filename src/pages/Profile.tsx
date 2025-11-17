@@ -31,6 +31,12 @@ interface UserRoutine {
   created_at: string
 }
 
+interface UserStreak {
+  current_streak: number
+  longest_streak: number
+  last_workout_date: string | null
+}
+
 const Profile = () => {
   const { userId } = useParams<{ userId: string }>()
   const [profile, setProfile] = useState<UserProfile | null>(null)
@@ -41,10 +47,12 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState<'posts' | 'routines'>('posts')
   const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState({ bio: '', profile_image_url: '' })
+  const [streak, setStreak] = useState<UserStreak | null>(null)
 
   useEffect(() => {
     loadProfile()
     loadCurrentUser()
+    loadStreak()
   }, [userId])
 
   useEffect(() => {
@@ -140,6 +148,24 @@ const Profile = () => {
       setRoutines(data || [])
     } catch (error) {
       console.error('Error loading routines:', error)
+    }
+  }
+
+  const loadStreak = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_streaks')
+        .select('*')
+        .eq('user_id', userId)
+        .single()
+
+      if (error && error.code !== 'PGRST116') {
+        throw error
+      }
+
+      setStreak(data || { current_streak: 0, longest_streak: 0, last_workout_date: null })
+    } catch (error) {
+      console.error('Error loading streak:', error)
     }
   }
 
@@ -264,6 +290,21 @@ const Profile = () => {
             <p className="text-sm text-gray-500 mt-4">
               Member since {new Date(profile.created_at).toLocaleDateString()}
             </p>
+            {streak && streak.current_streak > 0 && (
+              <div className="mt-4 p-3 bg-primary-50 rounded-lg">
+                <div className="flex items-center space-x-4">
+                  <div className="text-2xl">🔥</div>
+                  <div>
+                    <div className="font-semibold text-gray-900">
+                      {streak.current_streak} Day Streak
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      Longest: {streak.longest_streak} days
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -2,6 +2,8 @@ import { Routes, Route } from 'react-router-dom'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import Home from './pages/Home'
+import Dashboard from './pages/Dashboard'
+import StreakLeaderboard from './pages/StreakLeaderboard'
 import CommunityBoard from './pages/CommunityBoard'
 import PostDetail from './pages/PostDetail'
 import Profile from './pages/Profile'
@@ -16,6 +18,8 @@ function App() {
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/leaderboard" element={<StreakLeaderboard />} />
           <Route path="/community" element={<CommunityBoard />} />
           <Route path="/posts/:id" element={<PostDetail />} />
           <Route path="/profile/:userId" element={<Profile />} />
