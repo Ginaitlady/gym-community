@@ -288,14 +288,25 @@ export const api = {
 
   async getCurrentUser() {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return null;
+    if (!user) {
+      console.log('🔍 getCurrentUser: No auth user found');
+      return null;
+    }
 
-    const { data: profileData } = await supabase
+    console.log('🔍 getCurrentUser: Auth user ID:', user.id);
+    
+    const { data: profileData, error } = await supabase
       .from('users')
       .select('*')
       .eq('id', user.id)
       .single();
 
+    if (error) {
+      console.error('❌ getCurrentUser: Error fetching profile:', error);
+      return user; // Return auth user if profile fetch fails
+    }
+
+    console.log('🔍 getCurrentUser: Profile data:', profileData);
     return profileData || user;
   },
 };
