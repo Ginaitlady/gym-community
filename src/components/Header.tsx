@@ -78,6 +78,9 @@ const Header = () => {
                     Dashboard
                   </Link>
                 )}
+                <Link to="/marketplace" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                  Marketplace
+                </Link>
                 <Link to="/community" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                   Community
                 </Link>
@@ -148,6 +151,9 @@ const Header = () => {
                   Dashboard
                 </Link>
               )}
+              <Link to="/marketplace" className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                Marketplace
+              </Link>
               <Link to="/community" className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
                 Community
               </Link>
