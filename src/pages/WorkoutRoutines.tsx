@@ -203,6 +203,16 @@ const WorkoutRoutines = () => {
 
       if (error) throw error
 
+      // Check and award achievements
+      const { error: achievementError } = await supabase.rpc('check_and_award_achievements', {
+        p_user_id: user.id,
+        p_achievement_type: 'routine'
+      })
+
+      if (achievementError) {
+        console.error('Error checking achievements:', achievementError)
+      }
+
       setNewRoutine({
         name: '',
         description: '',

@@ -90,8 +90,7 @@ CREATE POLICY "Users can view own profile" ON users
 -- This is needed for posts/routines to display author names
 -- But restrict sensitive info (email, phone) to own profile only
 CREATE POLICY "Anyone can view public profile info" ON users
-  FOR SELECT USING (true)
-  WITH CHECK (false); -- Prevent updates through this policy
+  FOR SELECT USING (true);
 
 -- Enable Row Level Security on all tables
 ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
@@ -647,4 +646,231 @@ BEGIN
   WHERE trainer_id = p_trainer_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Gyms Table (gym locations and information)
+CREATE TABLE IF NOT EXISTS gyms (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  address TEXT NOT NULL,
+  city VARCHAR(100),
+  state VARCHAR(100),
+  country VARCHAR(100) DEFAULT 'USA',
+  latitude DECIMAL(10, 8),
+  longitude DECIMAL(11, 8),
+  phone VARCHAR(50),
+  website TEXT,
+  description TEXT,
+  facilities TEXT[], -- Array of facilities (e.g., ['Parking', 'Showers', 'Locker Room'])
+  opening_hours JSONB, -- Opening hours schedule
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+-- Gym Reviews Table
+CREATE TABLE IF NOT EXISTS gym_reviews (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  gym_id UUID REFERENCES gyms(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  review_text TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  CONSTRAINT unique_gym_user_review UNIQUE (gym_id, user_id)
+);
+
+-- Gym Memberships Table (users' gym memberships)
+CREATE TABLE IF NOT EXISTS gym_memberships (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  gym_id UUID REFERENCES gyms(id) ON DELETE CASCADE NOT NULL,
+  membership_type VARCHAR(50), -- e.g., 'monthly', 'annual', 'day_pass'
+  start_date DATE,
+  end_date DATE,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+-- Achievements Table (definitions of achievements)
+CREATE TABLE IF NOT EXISTS achievements (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name VARCHAR(100) NOT NULL UNIQUE,
+  description TEXT,
+  icon_url TEXT,
+  achievement_type VARCHAR(50) NOT NULL, -- 'workout', 'community', 'routine', 'challenge', etc.
+  requirement_value INTEGER, -- e.g., 5 for "First 5 workouts"
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+-- User Achievements Table (achievements earned by users)
+CREATE TABLE IF NOT EXISTS user_achievements (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  achievement_id UUID REFERENCES achievements(id) ON DELETE CASCADE NOT NULL,
+  earned_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  CONSTRAINT unique_user_achievement UNIQUE (user_id, achievement_id)
+);
+
+-- Enable RLS on new tables
+ALTER TABLE gyms ENABLE ROW LEVEL SECURITY;
+ALTER TABLE gym_reviews ENABLE ROW LEVEL SECURITY;
+ALTER TABLE gym_memberships ENABLE ROW LEVEL SECURITY;
+ALTER TABLE achievements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_achievements ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for Gyms
+DROP POLICY IF EXISTS "Anyone can view gyms" ON gyms;
+CREATE POLICY "Anyone can view gyms" ON gyms
+  FOR SELECT USING (true);
+
+-- RLS Policies for Gym Reviews
+DROP POLICY IF EXISTS "Anyone can view gym reviews" ON gym_reviews;
+CREATE POLICY "Anyone can view gym reviews" ON gym_reviews
+  FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Users can create gym reviews" ON gym_reviews;
+CREATE POLICY "Users can create gym reviews" ON gym_reviews
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update own gym reviews" ON gym_reviews;
+CREATE POLICY "Users can update own gym reviews" ON gym_reviews
+  FOR UPDATE USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can delete own gym reviews" ON gym_reviews;
+CREATE POLICY "Users can delete own gym reviews" ON gym_reviews
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- RLS Policies for Gym Memberships
+DROP POLICY IF EXISTS "Users can view own memberships" ON gym_memberships;
+CREATE POLICY "Users can view own memberships" ON gym_memberships
+  FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can create own memberships" ON gym_memberships;
+CREATE POLICY "Users can create own memberships" ON gym_memberships
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update own memberships" ON gym_memberships;
+CREATE POLICY "Users can update own memberships" ON gym_memberships
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- RLS Policies for Achievements
+DROP POLICY IF EXISTS "Anyone can view achievements" ON achievements;
+CREATE POLICY "Anyone can view achievements" ON achievements
+  FOR SELECT USING (true);
+
+-- RLS Policies for User Achievements
+DROP POLICY IF EXISTS "Users can view own achievements" ON user_achievements;
+CREATE POLICY "Users can view own achievements" ON user_achievements
+  FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Anyone can view user achievements for leaderboard" ON user_achievements;
+CREATE POLICY "Anyone can view user achievements for leaderboard" ON user_achievements
+  FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "System can create user achievements" ON user_achievements;
+CREATE POLICY "System can create user achievements" ON user_achievements
+  FOR INSERT WITH CHECK (true); -- Will be handled by function
+
+-- Update triggers
+DROP TRIGGER IF EXISTS update_gyms_updated_at ON gyms;
+CREATE TRIGGER update_gyms_updated_at BEFORE UPDATE ON gyms
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_gym_reviews_updated_at ON gym_reviews;
+CREATE TRIGGER update_gym_reviews_updated_at BEFORE UPDATE ON gym_reviews
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_gym_memberships_updated_at ON gym_memberships;
+CREATE TRIGGER update_gym_memberships_updated_at BEFORE UPDATE ON gym_memberships
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Function to check and award achievements
+CREATE OR REPLACE FUNCTION check_and_award_achievements(p_user_id UUID, p_achievement_type VARCHAR)
+RETURNS void AS $$
+DECLARE
+  v_count INTEGER;
+  v_achievement_record RECORD;
+BEGIN
+  -- Check different achievement types
+  IF p_achievement_type = 'workout' THEN
+    SELECT COUNT(*) INTO v_count
+    FROM workout_logs
+    WHERE user_id = p_user_id;
+    
+    -- Check workout achievements
+    FOR v_achievement_record IN
+      SELECT * FROM achievements
+      WHERE achievement_type = 'workout'
+      AND requirement_value <= v_count
+      AND id NOT IN (SELECT achievement_id FROM user_achievements WHERE user_id = p_user_id)
+    LOOP
+      INSERT INTO user_achievements (user_id, achievement_id)
+      VALUES (p_user_id, v_achievement_record.id)
+      ON CONFLICT (user_id, achievement_id) DO NOTHING;
+    END LOOP;
+    
+  ELSIF p_achievement_type = 'community' THEN
+    SELECT COUNT(*) INTO v_count
+    FROM posts
+    WHERE user_id = p_user_id AND is_deleted = FALSE;
+    
+    -- Check community achievements
+    FOR v_achievement_record IN
+      SELECT * FROM achievements
+      WHERE achievement_type = 'community'
+      AND requirement_value <= v_count
+      AND id NOT IN (SELECT achievement_id FROM user_achievements WHERE user_id = p_user_id)
+    LOOP
+      INSERT INTO user_achievements (user_id, achievement_id)
+      VALUES (p_user_id, v_achievement_record.id)
+      ON CONFLICT (user_id, achievement_id) DO NOTHING;
+    END LOOP;
+    
+  ELSIF p_achievement_type = 'routine' THEN
+    SELECT COUNT(*) INTO v_count
+    FROM workout_routines
+    WHERE user_id = p_user_id;
+    
+    -- Check routine achievements
+    FOR v_achievement_record IN
+      SELECT * FROM achievements
+      WHERE achievement_type = 'routine'
+      AND requirement_value <= v_count
+      AND id NOT IN (SELECT achievement_id FROM user_achievements WHERE user_id = p_user_id)
+    LOOP
+      INSERT INTO user_achievements (user_id, achievement_id)
+      VALUES (p_user_id, v_achievement_record.id)
+      ON CONFLICT (user_id, achievement_id) DO NOTHING;
+    END LOOP;
+  END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Insert default achievements
+INSERT INTO achievements (name, description, achievement_type, requirement_value) VALUES
+  -- Workout achievements
+  ('First Steps', 'Complete your first workout', 'workout', 1),
+  ('Getting Stronger', 'Complete 5 workouts', 'workout', 5),
+  ('Dedicated Athlete', 'Complete 10 workouts', 'workout', 10),
+  ('Workout Warrior', 'Complete 25 workouts', 'workout', 25),
+  -- Community achievements
+  ('First Post', 'Post your first community post', 'community', 1),
+  ('Active Member', 'Post 5 community posts', 'community', 5),
+  ('Community Leader', 'Post 10 community posts', 'community', 10),
+  -- Routine achievements
+  ('Routine Creator', 'Create your first workout routine', 'routine', 1),
+  ('Routine Master', 'Create 5 workout routines', 'routine', 5),
+  ('Routine Expert', 'Create 10 workout routines', 'routine', 10)
+ON CONFLICT (name) DO NOTHING;
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_gyms_location ON gyms(latitude, longitude);
+CREATE INDEX IF NOT EXISTS idx_gyms_city ON gyms(city);
+CREATE INDEX IF NOT EXISTS idx_gym_reviews_gym_id ON gym_reviews(gym_id);
+CREATE INDEX IF NOT EXISTS idx_gym_reviews_user_id ON gym_reviews(user_id);
+CREATE INDEX IF NOT EXISTS idx_gym_memberships_user_id ON gym_memberships(user_id);
+CREATE INDEX IF NOT EXISTS idx_gym_memberships_gym_id ON gym_memberships(gym_id);
+CREATE INDEX IF NOT EXISTS idx_user_achievements_user_id ON user_achievements(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_achievements_achievement_id ON user_achievements(achievement_id);
+CREATE INDEX IF NOT EXISTS idx_achievements_achievement_type ON achievements(achievement_type);
 

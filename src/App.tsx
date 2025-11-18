@@ -12,6 +12,9 @@ import Profile from './pages/Profile'
 import WorkoutRoutines from './pages/WorkoutRoutines'
 import RoutineDetail from './pages/RoutineDetail'
 import Admin from './pages/Admin'
+import GymLocator from './pages/GymLocator'
+import GymDetail from './pages/GymDetail'
+import Achievements from './pages/Achievements'
 
 function App() {
   return (
@@ -30,6 +33,9 @@ function App() {
           <Route path="/routines" element={<WorkoutRoutines />} />
           <Route path="/routines/:id" element={<RoutineDetail />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/gyms" element={<GymLocator />} />
+          <Route path="/gyms/:gymId" element={<GymDetail />} />
+          <Route path="/achievements" element={<Achievements />} />
         </Routes>
       </main>
       <Footer />

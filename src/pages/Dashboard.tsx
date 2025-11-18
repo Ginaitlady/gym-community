@@ -190,6 +190,16 @@ const Dashboard = () => {
         console.error('Error checking badges:', badgeError)
       }
 
+      // Check and award achievements
+      const { error: achievementError } = await supabase.rpc('check_and_award_achievements', {
+        p_user_id: user.id,
+        p_achievement_type: 'workout'
+      })
+
+      if (achievementError) {
+        console.error('Error checking achievements:', achievementError)
+      }
+
       setWorkoutForm({
         workout_date: new Date().toISOString().split('T')[0],
         routine_id: '',

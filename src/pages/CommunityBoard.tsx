@@ -137,6 +137,16 @@ const CommunityBoard = () => {
 
       if (error) throw error
 
+      // Check and award achievements
+      const { error: achievementError } = await supabase.rpc('check_and_award_achievements', {
+        p_user_id: user.id,
+        p_achievement_type: 'community'
+      })
+
+      if (achievementError) {
+        console.error('Error checking achievements:', achievementError)
+      }
+
       setNewPost({ title: '', content: '', image_url: '' })
       setShowCreateModal(false)
       loadPosts()

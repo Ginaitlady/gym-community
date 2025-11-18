@@ -87,6 +87,14 @@ const Header = () => {
                 <Link to="/routines" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                   Routines
                 </Link>
+                <Link to="/gyms" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                  Gyms
+                </Link>
+                {currentUser && (
+                  <Link to="/achievements" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                    🏆 Achievements
+                  </Link>
+                )}
                 {currentUser?.role === 'admin' && (
                   <Link to="/admin" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                     Admin
@@ -157,14 +165,22 @@ const Header = () => {
               <Link to="/community" className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
                 Community
               </Link>
-              <Link to="/routines" className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
-                Routines
-              </Link>
-              {currentUser?.role === 'admin' && (
-                <Link to="/admin" className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
-                  Admin
-                </Link>
-              )}
+                  <Link to="/routines" className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                    Routines
+                  </Link>
+                  <Link to="/gyms" className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                    Gyms
+                  </Link>
+                  {currentUser && (
+                    <Link to="/achievements" className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                      🏆 Achievements
+                    </Link>
+                  )}
+                  {currentUser?.role === 'admin' && (
+                    <Link to="/admin" className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
+                      Admin
+                    </Link>
+                  )}
               <div className="pt-4 pb-2 space-y-1">
                 {currentUser ? (
                   <>
