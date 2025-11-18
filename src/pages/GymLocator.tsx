@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/api'
 import { supabase } from '../lib/supabase'
+import { calculateDistance, formatDistance } from '../utils/distance'
 
 interface Gym {
   id: string
@@ -105,7 +106,32 @@ const GymLocator = () => {
     gym.city?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const onMapLoad = useCallback((map: any) => {
+  // Sort gyms by distance if user location is available
+  const sortedGyms = useMemo(() => {
+    if (!userLocation) return filteredGyms
+
+    return [...filteredGyms].sort((a, b) => {
+      if (!a.latitude || !a.longitude) return 1
+      if (!b.latitude || !b.longitude) return -1
+
+      const distanceA = calculateDistance(
+        userLocation.lat,
+        userLocation.lng,
+        a.latitude,
+        a.longitude
+      )
+      const distanceB = calculateDistance(
+        userLocation.lat,
+        userLocation.lng,
+        b.latitude,
+        b.longitude
+      )
+
+      return distanceA - distanceB
+    })
+  }, [filteredGyms, userLocation])
+
+  const onMapLoad = useCallback(() => {
     // Map is loaded
   }, [])
 
@@ -143,7 +169,17 @@ const GymLocator = () => {
               <p className="text-gray-500">No gyms found.</p>
             </div>
           ) : (
-            filteredGyms.map((gym) => (
+            sortedGyms.map((gym) => {
+              const distance = userLocation && gym.latitude && gym.longitude
+                ? formatDistance(calculateDistance(
+                    userLocation.lat,
+                    userLocation.lng,
+                    gym.latitude,
+                    gym.longitude
+                  ))
+                : null
+
+              return (
               <Link
                 key={gym.id}
                 to={`/gyms/${gym.id}`}
@@ -161,7 +197,12 @@ const GymLocator = () => {
                 </div>
                 <p className="text-gray-600 mb-2">{gym.address}</p>
                 {gym.city && gym.state && (
-                  <p className="text-sm text-gray-500 mb-3">{gym.city}, {gym.state}</p>
+                  <p className="text-sm text-gray-500 mb-1">{gym.city}, {gym.state}</p>
+                )}
+                {distance && (
+                  <p className="text-sm text-primary-600 font-semibold mb-3">
+                    📍 {distance} away
+                  </p>
                 )}
                 {gym.facilities && gym.facilities.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-3">
@@ -181,7 +222,8 @@ const GymLocator = () => {
                   </div>
                 )}
               </Link>
-            ))
+              )
+            })
           )}
         </div>
 
@@ -195,7 +237,7 @@ const GymLocator = () => {
                 zoom={userLocation ? 12 : 10}
                 onLoad={onMapLoad}
               >
-                {filteredGyms.map((gym) => {
+                {sortedGyms.map((gym) => {
                   if (!gym.latitude || !gym.longitude) return null
                   return (
                     <Marker
