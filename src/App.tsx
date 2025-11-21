@@ -4,8 +4,6 @@ import Footer from './components/Footer'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import StreakLeaderboard from './pages/StreakLeaderboard'
-import TrainerMarketplace from './pages/TrainerMarketplace'
-import TrainerProfile from './pages/TrainerProfile'
 import CommunityBoard from './pages/CommunityBoard'
 import PostDetail from './pages/PostDetail'
 import Profile from './pages/Profile'
@@ -25,8 +23,6 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/leaderboard" element={<StreakLeaderboard />} />
-          <Route path="/marketplace" element={<TrainerMarketplace />} />
-          <Route path="/trainers/:trainerId" element={<TrainerProfile />} />
           <Route path="/community" element={<CommunityBoard />} />
           <Route path="/posts/:id" element={<PostDetail />} />
           <Route path="/profile/:userId" element={<Profile />} />

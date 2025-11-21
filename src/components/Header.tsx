@@ -33,32 +33,6 @@ const Header = () => {
     window.location.reload()
   }
 
-  const handleRequestTrainer = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-
-      const { error } = await supabase
-        .from('trainer_approvals')
-        .insert({
-          user_id: user.id,
-          status: 'pending'
-        })
-
-      if (error) {
-        if (error.code === '23505') {
-          alert('You have already submitted a trainer approval request.')
-        } else {
-          throw error
-        }
-      } else {
-        alert('Trainer approval request submitted successfully!')
-      }
-    } catch (error: any) {
-      console.error('Error requesting trainer approval:', error)
-      alert(error.message || 'Failed to submit request')
-    }
-  }
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -78,9 +52,6 @@ const Header = () => {
                     Dashboard
                   </Link>
                 )}
-                <Link to="/marketplace" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                  Marketplace
-                </Link>
                 <Link to="/community" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                   Community
                 </Link>
@@ -113,14 +84,6 @@ const Header = () => {
                   >
                     {currentUser.first_name} {currentUser.last_name}
                   </Link>
-                  {currentUser.role === 'member' && !currentUser.is_trainer_approved && (
-                    <button
-                      onClick={handleRequestTrainer}
-                      className="text-gray-700 hover:text-primary-600 font-medium text-sm"
-                    >
-                      Become Trainer
-                    </button>
-                  )}
                   <button onClick={handleSignOut} className="text-gray-700 hover:text-primary-600 font-medium">
                     Sign Out
                   </button>
@@ -159,9 +122,6 @@ const Header = () => {
                   Dashboard
                 </Link>
               )}
-              <Link to="/marketplace" className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
-                Marketplace
-              </Link>
               <Link to="/community" className="text-gray-700 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium" onClick={() => setIsMenuOpen(false)}>
                 Community
               </Link>
@@ -191,17 +151,6 @@ const Header = () => {
                     >
                       Profile
                     </Link>
-                    {currentUser.role === 'member' && !currentUser.is_trainer_approved && (
-                      <button
-                        onClick={() => {
-                          handleRequestTrainer()
-                          setIsMenuOpen(false)
-                        }}
-                        className="text-gray-700 hover:text-primary-600 block w-full text-left px-3 py-2 rounded-md text-base font-medium"
-                      >
-                        Become Trainer
-                      </button>
-                    )}
                     <button onClick={() => { handleSignOut(); setIsMenuOpen(false); }} className="text-gray-700 hover:text-primary-600 block w-full text-left px-3 py-2 rounded-md text-base font-medium">
                       Sign Out
                     </button>
