@@ -40,7 +40,9 @@ const Header = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <Link to="/" className="text-2xl font-bold text-primary-600">FitHub</Link>
+              <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent hover:from-purple-700 hover:to-pink-700 transition-all">
+                FitHub
+              </Link>
             </div>
             <div className="hidden md:block ml-10">
               <div className="flex items-baseline space-x-4">

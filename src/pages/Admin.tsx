@@ -165,7 +165,7 @@ const Admin = () => {
 
   const handleGeocodeAddress = async () => {
     if (!newGym.address) {
-      alert('주소를 입력해주세요')
+      alert('Please enter an address')
       return
     }
 
@@ -173,7 +173,7 @@ const Admin = () => {
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
     
     if (!apiKey) {
-      alert('Google Maps API 키가 설정되지 않았습니다')
+      alert('Google Maps API key is not configured')
       setIsGeocoding(false)
       return
     }
@@ -188,13 +188,13 @@ const Admin = () => {
           latitude: result.lat,
           longitude: result.lng
         }))
-        alert(`좌표를 성공적으로 가져왔습니다!\n위도: ${result.lat.toFixed(6)}, 경도: ${result.lng.toFixed(6)}`)
+        alert(`Coordinates retrieved successfully!\nLatitude: ${result.lat.toFixed(6)}, Longitude: ${result.lng.toFixed(6)}`)
       } else {
-        alert('주소를 찾을 수 없습니다. 좌표를 수동으로 입력해주세요.')
+        alert('Address not found. Please enter coordinates manually.')
       }
     } catch (error) {
       console.error('Geocoding error:', error)
-      alert('좌표 변환 중 오류가 발생했습니다.')
+      alert('Error converting address to coordinates.')
     } finally {
       setIsGeocoding(false)
     }
@@ -221,7 +221,7 @@ const Admin = () => {
     e.preventDefault()
     
     if (!newGym.name || !newGym.address) {
-      alert('헬스장 이름과 주소는 필수입니다.')
+      alert('Gym name and address are required.')
       return
     }
 
@@ -259,18 +259,18 @@ const Admin = () => {
       })
       setFacilityInput('')
       
-      alert('헬스장이 성공적으로 추가되었습니다!')
+      alert('Gym added successfully!')
       loadGyms()
     } catch (error: any) {
       console.error('Error creating gym:', error)
-      alert(error.message || '헬스장 추가 중 오류가 발생했습니다.')
+      alert(error.message || 'Failed to add gym.')
     } finally {
       setIsSubmitting(false)
     }
   }
 
   const handleDeleteGym = async (gymId: string) => {
-    if (!confirm('이 헬스장을 삭제하시겠습니까?')) return
+    if (!confirm('Are you sure you want to delete this gym?')) return
 
     try {
       const { error } = await supabase
@@ -281,21 +281,21 @@ const Admin = () => {
       if (error) throw error
 
       loadGyms()
-      alert('헬스장이 삭제되었습니다.')
+      alert('Gym deleted successfully.')
     } catch (error: any) {
       console.error('Error deleting gym:', error)
-      alert(error.message || '헬스장 삭제 중 오류가 발생했습니다.')
+      alert(error.message || 'Failed to delete gym.')
     }
   }
 
   const handleSearchGyms = async () => {
     if (!searchQuery.trim()) {
-      alert('검색할 지역을 입력해주세요')
+      alert('Please enter a location to search')
       return
     }
 
     if (!isPlacesLoaded || !placesServiceRef.current || !geocoderRef.current) {
-      alert('Google Maps Places Library가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.')
+      alert('Google Maps Places Library is still loading. Please try again in a moment.')
       return
     }
 
@@ -397,13 +397,13 @@ const Admin = () => {
       setSearchResults(nearbyResults)
 
       if (nearbyResults.length === 0) {
-        alert('검색 결과가 없습니다.\n\n다음을 시도해보세요:\n1. 검색 반경을 늘리기 (예: 10000미터)\n2. 검색어 변경 (예: "Toronto, ON")\n3. 다른 지역 검색')
+        alert('No search results found.\n\nTry the following:\n1. Increase search radius (e.g., 10000 meters)\n2. Change search query (e.g., "Toronto, ON")\n3. Search a different area')
       } else {
-        alert(`${nearbyResults.length}개의 헬스장을 찾았습니다!`)
+        alert(`Found ${nearbyResults.length} gym(s)!`)
       }
     } catch (error) {
       console.error('❌ Error searching gyms:', error)
-      alert(`헬스장 검색 중 오류가 발생했습니다.\n\n오류: ${error instanceof Error ? error.message : 'Unknown error'}\n\n브라우저 콘솔(F12)을 확인하세요.`)
+      alert(`Error searching for gyms.\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}\n\nPlease check the browser console (F12).`)
     } finally {
       setIsSearching(false)
     }
@@ -440,11 +440,11 @@ const Admin = () => {
 
   const handleImportSelected = async () => {
     if (selectedPlaces.size === 0) {
-      alert('가져올 헬스장을 선택해주세요')
+      alert('Please select gyms to import')
       return
     }
 
-    if (!confirm(`${selectedPlaces.size}개의 헬스장을 데이터베이스에 추가하시겠습니까?`)) {
+    if (!confirm(`Add ${selectedPlaces.size} gym(s) to the database?`)) {
       return
     }
 
@@ -468,7 +468,7 @@ const Admin = () => {
       )
 
       if (newGyms.length === 0) {
-        alert('모든 헬스장이 이미 데이터베이스에 존재합니다.')
+        alert('All selected gyms already exist in the database.')
         setIsImporting(false)
         return
       }
@@ -479,12 +479,12 @@ const Admin = () => {
 
       if (error) throw error
 
-      alert(`${newGyms.length}개의 헬스장이 성공적으로 추가되었습니다!`)
+      alert(`${newGyms.length} gym(s) added successfully!`)
       setSelectedPlaces(new Set())
       loadGyms()
     } catch (error: any) {
       console.error('Error importing gyms:', error)
-      alert(error.message || '헬스장 가져오기 중 오류가 발생했습니다.')
+      alert(error.message || 'Failed to import gyms.')
     } finally {
       setIsImporting(false)
     }
@@ -573,7 +573,7 @@ const Admin = () => {
             <div className="space-y-6">
               {/* Places API Search */}
               <div className="border rounded-lg p-6 bg-blue-50">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Google Places API로 헬스장 검색</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Search Gyms with Google Places API</h2>
                 {import.meta.env.VITE_GOOGLE_MAPS_API_KEY && (
                   <LoadScript
                     googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
@@ -587,19 +587,19 @@ const Admin = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        검색 지역
+                        Search Location
                       </label>
                       <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="예: Toronto downtown, New York, Seoul"
+                        placeholder="e.g., Toronto downtown, New York, Seoul"
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        검색 반경 (미터)
+                        Search Radius (meters)
                       </label>
                       <input
                         type="number"
@@ -617,31 +617,31 @@ const Admin = () => {
                     disabled={isSearching || !searchQuery.trim() || !isPlacesLoaded}
                     className="w-full md:w-auto px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                   >
-                    {!isPlacesLoaded ? 'Places Library 로딩 중...' : isSearching ? '검색 중...' : '헬스장 검색'}
+                    {!isPlacesLoaded ? 'Loading Places Library...' : isSearching ? 'Searching...' : 'Search Gyms'}
                   </button>
                   {!isPlacesLoaded && (
-                    <p className="text-sm text-gray-600">Google Places Library를 로드하는 중입니다...</p>
+                    <p className="text-sm text-gray-600">Loading Google Places Library...</p>
                   )}
 
                   {searchResults.length > 0 && (
                     <div className="mt-6">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-semibold text-gray-900">
-                          검색 결과 ({searchResults.length}개)
+                          Search Results ({searchResults.length})
                         </h3>
                         <div className="flex gap-2">
                           <button
                             onClick={handleSelectAll}
                             className="px-4 py-2 text-sm bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
                           >
-                            {selectedPlaces.size === searchResults.length ? '전체 해제' : '전체 선택'}
+                            {selectedPlaces.size === searchResults.length ? 'Deselect All' : 'Select All'}
                           </button>
                           <button
                             onClick={handleImportSelected}
                             disabled={isImporting || selectedPlaces.size === 0}
                             className="px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                           >
-                            {isImporting ? '가져오는 중...' : `선택한 ${selectedPlaces.size}개 가져오기`}
+                            {isImporting ? 'Importing...' : `Import ${selectedPlaces.size} Selected`}
                           </button>
                         </div>
                       </div>
@@ -692,39 +692,39 @@ const Admin = () => {
 
               {/* Add Gym Form */}
               <div className="border rounded-lg p-6 bg-gray-50">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">새 헬스장 추가</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Add New Gym</h2>
                 <form onSubmit={handleCreateGym} className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        헬스장 이름 <span className="text-red-500">*</span>
+                        Gym Name <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         value={newGym.name}
                         onChange={(e) => setNewGym({ ...newGym, name: e.target.value })}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="예: 강남 피트니스 센터"
+                        placeholder="e.g., Downtown Fitness Center"
                         required
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        전화번호
+                        Phone Number
                       </label>
                       <input
                         type="tel"
                         value={newGym.phone}
                         onChange={(e) => setNewGym({ ...newGym, phone: e.target.value })}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="예: 02-1234-5678"
+                        placeholder="e.g., (555) 123-4567"
                       />
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      주소 <span className="text-red-500">*</span>
+                      Address <span className="text-red-500">*</span>
                     </label>
                     <div className="flex gap-2">
                       <input
@@ -732,7 +732,7 @@ const Admin = () => {
                         value={newGym.address}
                         onChange={(e) => setNewGym({ ...newGym, address: e.target.value })}
                         className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="예: 강남대로 123"
+                        placeholder="e.g., 123 Main Street"
                         required
                       />
                       <button
@@ -741,7 +741,7 @@ const Admin = () => {
                         disabled={isGeocoding || !newGym.address}
                         className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                       >
-                        {isGeocoding ? '변환 중...' : '좌표 가져오기'}
+                        {isGeocoding ? 'Converting...' : 'Get Coordinates'}
                       </button>
                     </div>
                   </div>
@@ -749,26 +749,26 @@ const Admin = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        도시
+                        City
                       </label>
                       <input
                         type="text"
                         value={newGym.city}
                         onChange={(e) => setNewGym({ ...newGym, city: e.target.value })}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="예: 서울"
+                        placeholder="e.g., Toronto"
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        주/도
+                        State/Province
                       </label>
                       <input
                         type="text"
                         value={newGym.state}
                         onChange={(e) => setNewGym({ ...newGym, state: e.target.value })}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="예: 서울특별시"
+                        placeholder="e.g., Ontario"
                       />
                     </div>
                   </div>
@@ -776,14 +776,14 @@ const Admin = () => {
                   {(newGym.latitude !== undefined && newGym.longitude !== undefined) && (
                     <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
                       <p className="text-sm text-green-800">
-                        <strong>좌표:</strong> 위도 {newGym.latitude.toFixed(6)}, 경도 {newGym.longitude.toFixed(6)}
+                        <strong>Coordinates:</strong> Latitude {newGym.latitude.toFixed(6)}, Longitude {newGym.longitude.toFixed(6)}
                       </p>
                     </div>
                   )}
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      웹사이트
+                      Website
                     </label>
                     <input
                       type="url"
@@ -796,20 +796,20 @@ const Admin = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      설명
+                      Description
                     </label>
                     <textarea
                       value={newGym.description}
                       onChange={(e) => setNewGym({ ...newGym, description: e.target.value })}
                       rows={3}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="헬스장에 대한 설명을 입력하세요"
+                      placeholder="Enter a description for the gym"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      시설 (Parking, Showers, Locker Room 등)
+                      Facilities (Parking, Showers, Locker Room, etc.)
                     </label>
                     <div className="flex gap-2 mb-2">
                       <input
@@ -823,14 +823,14 @@ const Admin = () => {
                           }
                         }}
                         className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="시설 이름 입력 후 Enter 또는 추가 버튼 클릭"
+                        placeholder="Enter facility name and press Enter or click Add"
                       />
                       <button
                         type="button"
                         onClick={handleAddFacility}
                         className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
                       >
-                        추가
+                        Add
                       </button>
                     </div>
                     {newGym.facilities.length > 0 && (
@@ -859,16 +859,16 @@ const Admin = () => {
                     disabled={isSubmitting}
                     className="w-full btn-primary disabled:bg-gray-400 disabled:cursor-not-allowed"
                   >
-                    {isSubmitting ? '추가 중...' : '헬스장 추가'}
+                    {isSubmitting ? 'Adding...' : 'Add Gym'}
                   </button>
                 </form>
               </div>
 
               {/* Gym List */}
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">헬스장 목록 ({gyms.length})</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Gym List ({gyms.length})</h2>
                 {gyms.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">등록된 헬스장이 없습니다.</p>
+                  <p className="text-gray-500 text-center py-8">No gyms registered.</p>
                 ) : (
                   <div className="space-y-4">
                     {gyms.map((gym) => (
@@ -892,7 +892,7 @@ const Admin = () => {
                             )}
                             {gym.latitude && gym.longitude && (
                               <p className="text-xs text-gray-500 mt-2">
-                                위치: {gym.latitude.toFixed(6)}, {gym.longitude.toFixed(6)}
+                                Location: {gym.latitude.toFixed(6)}, {gym.longitude.toFixed(6)}
                               </p>
                             )}
                             {gym.facilities && gym.facilities.length > 0 && (
@@ -915,7 +915,7 @@ const Admin = () => {
                             onClick={() => handleDeleteGym(gym.id)}
                             className="ml-4 px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors"
                           >
-                            삭제
+                            Delete
                           </button>
                         </div>
                       </div>

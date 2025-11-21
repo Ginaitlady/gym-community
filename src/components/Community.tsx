@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 const Community = () => {
   const testimonials = [
     {
@@ -21,7 +23,7 @@ const Community = () => {
   ]
 
   return (
-    <section id="community" className="py-20 bg-gray-50">
+    <section id="community" className="py-20 bg-gradient-to-b from-purple-50 to-pink-50">
       <div className="section-container">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -57,12 +59,12 @@ const Community = () => {
               Join our performance-driven fitness journey and become part of a community that achieves goals together
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="btn-primary text-lg px-8">
+              <Link to="/dashboard" className="btn-primary text-lg px-8 text-center">
                 Start Free
-              </button>
-              <button className="btn-secondary text-lg px-8">
-                View Demo
-              </button>
+              </Link>
+              <Link to="/community" className="btn-secondary text-lg px-8 text-center">
+                Join Community
+              </Link>
             </div>
           </div>
         </div>
